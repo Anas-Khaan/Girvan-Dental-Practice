@@ -1,0 +1,6 @@
+{
+  "name": "Girvan Dental Practice",
+  "description": "Modern NHS & Private dental practice in Girvan, Ayrshire. Providing routine dentistry, cosmetic treatments, C-Fast orthodontics, dental implants, Childsmile care, and online appointment booking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
