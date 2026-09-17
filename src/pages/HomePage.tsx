@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { PageId } from '../types';
 import {
   PRACTICE_INFO,
-  TREATMENTS,
-  TREATMENT_CATEGORIES,
   TEAM_MEMBERS,
-  DENPLAN_ESSENTIALS,
   TESTIMONIALS,
 } from '../data/practiceData';
 import {
@@ -21,11 +18,15 @@ import {
   CheckCircle,
   AlertCircle,
   Star,
-  ChevronRight,
-  HeartHandshake,
   Check,
-  Layers,
+  Mail,
+  Send,
+  Users,
+  CheckCircle2,
+  X,
+  Heart,
   Smile,
+  ChevronRight,
 } from 'lucide-react';
 
 interface HomePageProps {
@@ -34,29 +35,100 @@ interface HomePageProps {
   onOpenSmileQuiz: () => void;
 }
 
+interface PopularTreatment {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  category: string;
+}
+
+const POPULAR_TREATMENTS: PopularTreatment[] = [
+  {
+    id: 'implants',
+    name: 'Dental Implants',
+    description: 'Permanent titanium tooth replacements that look, feel, and function just like your natural teeth.',
+    imageUrl: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&w=600&q=80',
+    category: 'Restorative',
+  },
+  {
+    id: 'whitening',
+    name: 'Teeth Whitening',
+    description: 'Boutique customized home whitening kits designed to safely lift stains and brighten your smile.',
+    imageUrl: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=600&q=80',
+    category: 'Cosmetic',
+  },
+  {
+    id: 'veneers',
+    name: 'Veneers',
+    description: 'Ultra-thin, custom porcelain or composite shells that cover chips, discoloration, and small gaps.',
+    imageUrl: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=600&q=80',
+    category: 'Cosmetic',
+  },
+  {
+    id: 'aligners',
+    name: 'Clear Aligners',
+    description: 'Discreet, removable clear aligners and C-Fast adult orthodontics to gently straighten your front smile.',
+    imageUrl: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=600&q=80',
+    category: 'Orthodontics',
+  },
+  {
+    id: 'crowns',
+    name: 'Dental Crowns',
+    description: 'Durable, natural-looking porcelain crowns and bridges to protect and restore weakened teeth.',
+    imageUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80',
+    category: 'Restorative',
+  },
+  {
+    id: 'dentures',
+    name: 'Dentures',
+    description: 'Custom-fitted full and partial acrylic or lightweight chrome dentures for natural chewing and speech.',
+    imageUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=600&q=80',
+    category: 'Prosthetics',
+  },
+  {
+    id: 'root-canal',
+    name: 'Root Canal Treatment',
+    description: 'Gentle endodontic care to relieve acute toothache, clear infection, and save your natural tooth.',
+    imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80',
+    category: 'General',
+  },
+  {
+    id: 'hygiene',
+    name: 'Dental Hygiene',
+    description: 'Thorough scaling, plaque removal, and periodontal therapy to protect your gums and freshen breath.',
+    imageUrl: 'https://images.unsplash.com/photo-1629909615184-74f495363b67?auto=format&fit=crop&w=600&q=80',
+    category: 'Preventive',
+  },
+];
+
 export const HomePage: React.FC<HomePageProps> = ({
   onNavigate,
   onOpenBooking,
   onOpenSmileQuiz,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [heroTreatmentSelect, setHeroTreatmentSelect] = useState<string>('Routine Dental Examination');
-  const [heroPatientType, setHeroPatientType] = useState<string>('existing-nhs');
+  // Contact/Enquiry Form State
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    treatment: 'General Routine Appointment',
+    message: '',
+  });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [showAllReviewsModal, setShowAllReviewsModal] = useState(false);
 
-  const filteredTreatments =
-    selectedCategory === 'all'
-      ? TREATMENTS.slice(0, 6)
-      : TREATMENTS.filter((t) => t.categoryId === selectedCategory);
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormSubmitted(true);
+  };
 
   return (
     <div className="space-y-16 sm:space-y-24">
       {/* 1. HERO SECTION */}
       <section className="relative overflow-hidden bg-gradient-to-b from-[#F0F7FD] via-white to-slate-50 pt-8 sm:pt-14 pb-16 sm:pb-20 border-b border-slate-200/80">
-        {/* Subtle background dental pattern */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#0B3B60_1px,transparent_1px)] [background-size:16px_16px]" />
-
         <div className="max-w-7xl mx-auto px-4 sm:px-8 relative">
-          {/* Top Trust Pills */}
+          {/* Practice Trust Pills */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#005EB8] text-white shadow-xs">
               <span>NHS</span> Scotland Provider
@@ -67,7 +139,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </span>
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-900 border border-emerald-200">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-700" />
-              Serving Girvan Since 2007
+              Serving Girvan & South Ayrshire
             </span>
           </div>
 
@@ -75,16 +147,17 @@ export const HomePage: React.FC<HomePageProps> = ({
             {/* Left Content Column */}
             <div className="lg:col-span-7 space-y-6">
               <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B3B60] tracking-tight leading-[1.15]">
-                Compassionate, Modern Dentistry for the Whole Family in Girvan
+                Dentist in Girvan, Ayrshire
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
-                Welcome to Girvan Dental Practice at 78 Dalrymple Street. Led by Dr. Tanu Sharma,
-                our dedicated team provides comprehensive NHS family dentistry alongside advanced
-                cosmetic smile design, C-Fast braces, and dental implants.
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
+                Providing caring NHS and private family dental care at 78 Dalrymple Street. Led by
+                Dr. Tanu Sharma, our experienced clinical team delivers gentle preventive dentistry,
+                restorative treatments, modern cosmetic smile design, and dental implants in a welcoming,
+                accessible practice.
               </p>
 
-              {/* Quick Key Highlights */}
+              {/* Verified Trust Badges Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1 text-xs sm:text-sm font-semibold text-slate-700">
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
@@ -92,171 +165,117 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Childsmile Partner</span>
+                  <span>Childsmile accredited</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Same-day emergencies</span>
+                  <span>Prompt emergency triage</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Denplan Essentials</span>
+                  <span>Denplan Essentials plans</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Modern Decontamination</span>
+                  <span>SHTM 2010 Decontamination</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <span>Registered with GDC</span>
+                  <span>GDC registered clinicians</span>
                 </div>
               </div>
 
-              {/* Primary Call to Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              {/* Two Prominent Conversion Buttons */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-3">
                 <button
                   onClick={() => onOpenBooking()}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#0B3B60] to-[#0284C7] hover:from-[#092e4b] hover:to-[#0274ae] text-white text-base font-bold rounded-xl shadow-md hover:shadow-lg transition-all active:scale-98"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[#0B3B60] to-[#0284C7] hover:from-[#092e4b] hover:to-[#0274ae] text-white text-base font-bold rounded-xl shadow-md hover:shadow-lg transition-all active:scale-98 whitespace-nowrap"
                 >
-                  <Calendar className="w-5 h-5 text-sky-200" />
+                  <Calendar className="w-5 h-5 text-sky-200 flex-shrink-0" />
                   <span>Book an Appointment</span>
-                </button>
-
-                <button
-                  onClick={onOpenSmileQuiz}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-white hover:bg-slate-50 text-sky-900 text-sm font-bold rounded-xl border border-sky-300 shadow-xs transition-colors"
-                >
-                  <Sparkles className="w-4 h-4 text-sky-600" />
-                  <span>30-Sec Smile Assessment</span>
                 </button>
 
                 <a
                   href="tel:01465712213"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-3.5 text-slate-700 hover:text-[#0B3B60] text-sm font-semibold"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white hover:bg-slate-50 text-[#0B3B60] font-bold text-base rounded-xl border-2 border-slate-300 hover:border-[#0B3B60] shadow-xs transition-colors whitespace-nowrap"
                 >
-                  <Phone className="w-4 h-4 text-[#0B3B60]" />
-                  <span>01465 712213</span>
+                  <Phone className="w-4 h-4 text-[#0B3B60] flex-shrink-0" />
+                  <span>Call 01465 712213</span>
                 </a>
               </div>
 
-              {/* Trust Badge with Doctor Photo */}
+              {/* Trust Badge with Clinicians */}
               <div className="pt-2 flex items-center gap-3.5 text-xs text-slate-600">
                 <div className="flex -space-x-2">
                   <img
                     src="https://www.girvandental.co.uk/modules/mod_news_pro_gk5/cache/team.2018.45-tanunsp-102.jpg"
-                    alt="Tanu Sharma"
+                    alt="Dr. Tanu Sharma"
                     referrerPolicy="no-referrer"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-xs"
                   />
                   <img
                     src="https://www.girvandental.co.uk/modules/mod_news_pro_gk5/cache/team.2018.43-sadansp-102.jpg"
-                    alt="Sada Mangalampalli"
+                    alt="Dr. Sada Mangalampalli"
                     referrerPolicy="no-referrer"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-xs"
                   />
                   <img
                     src="https://www.girvandental.co.uk/modules/mod_news_pro_gk5/cache/team.Ewan-200nsp-102.jpg"
-                    alt="Ewan Ramsay"
+                    alt="Dr. Ewan Ramsay"
                     referrerPolicy="no-referrer"
                     className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-xs"
                   />
                 </div>
                 <div>
-                  <div className="flex items-center gap-1 text-amber-500">
+                  <div className="flex items-center gap-1 text-amber-500 font-bold">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                     ))}
-                    <span className="font-bold text-slate-900 ml-1">4.9 / 5.0</span>
+                    <span className="text-slate-900 ml-1">5.0 Star Patient Feedback</span>
                   </div>
                   <span className="text-[11px] text-slate-500">
-                    Over 5,000+ local Ayrshire smiles cared for since 2007
+                    Trusted by families across Girvan, Turnberry, Maybole & Ballantrae
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Right Hero: Quick Appointment Launcher Card */}
+            {/* Right Hero Image Card */}
             <div className="lg:col-span-5">
-              <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-xl border border-slate-200/90 relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0B3B60] via-[#0284C7] to-sky-400" />
-
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700">
-                      Quick Scheduling
+              <div className="bg-white rounded-2xl p-3 shadow-xl border border-slate-200/90 relative overflow-hidden">
+                <div className="h-80 sm:h-96 rounded-xl overflow-hidden relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80"
+                    alt="Girvan Dental Practice Treatment Surgery"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  
+                  {/* Overlay Badges */}
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#0B3B60]/90 text-white backdrop-blur-xs">
+                      78 Dalrymple Street
                     </span>
-                    <h2 className="font-display font-bold text-xl text-slate-900">
-                      Find an Appointment
-                    </h2>
-                  </div>
-                  <div className="w-10 h-10 rounded-xl bg-sky-50 text-[#0B3B60] flex items-center justify-center">
-                    <Calendar className="w-5 h-5" />
-                  </div>
-                </div>
-
-                <div className="space-y-4 text-sm">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      I am visiting as:
-                    </label>
-                    <select
-                      value={heroPatientType}
-                      onChange={(e) => setHeroPatientType(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-800 text-sm font-medium focus:ring-2 focus:ring-[#0B3B60]"
-                    >
-                      <option value="existing-nhs">Existing NHS Patient</option>
-                      <option value="new-patient">New Patient Registration Inquiry</option>
-                      <option value="private">Private / Cosmetic Consultation</option>
-                      <option value="denplan">Denplan Essentials Member</option>
-                      <option value="childsmile">Childsmile Visit (Children)</option>
-                      <option value="emergency">Emergency / Acute Toothache</option>
-                    </select>
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600/90 text-white backdrop-blur-xs flex items-center gap-1">
+                      <Accessibility className="w-3.5 h-3.5" />
+                      Step-Free Access
+                    </span>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Required Service:
-                    </label>
-                    <select
-                      value={heroTreatmentSelect}
-                      onChange={(e) => setHeroTreatmentSelect(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-800 text-sm font-medium focus:ring-2 focus:ring-[#0B3B60]"
-                    >
-                      <option value="Routine Dental Examination">Routine Dental Examination</option>
-                      <option value="Dental Hygiene Scaling & Air Polish">Dental Hygiene Scaling</option>
-                      <option value="Tooth Pain or Broken Tooth Emergency">Emergency Toothache Relief</option>
-                      <option value="Childsmile Children’s Check-up">Childsmile Children's Care</option>
-                      <option value="Professional Boutique Teeth Whitening">Teeth Whitening Consultation</option>
-                      <option value="Composite Bonding & Smile Contouring">Composite Edge Bonding</option>
-                      <option value="C-Fast Adult Fast Orthodontics">C-Fast Adult Braces Consultation</option>
-                      <option value="Dental Implants & 3D CBCT Guided Surgery">Dental Implants Consultation</option>
-                      <option value="Dentures Check, Repair or New Set">Dentures Check / New Set</option>
-                    </select>
-                  </div>
-
-                  {/* Immediate Emergency Alert Box */}
-                  <div className="p-3 bg-amber-50/80 border border-amber-200/90 rounded-xl text-xs text-amber-900 flex items-start gap-2">
-                    <Clock className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <span className="font-bold block">Need same-day emergency care?</span>
-                      Call reception at 9:00 AM on{' '}
-                      <a href="tel:01465712213" className="font-bold underline text-amber-950">
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <h2 className="text-base font-bold">Modern Surgery Facilities</h2>
+                    <p className="text-xs text-slate-200 mt-0.5">
+                      Ground-floor surgery equipped for routine and complex dental treatments.
+                    </p>
+                    <div className="mt-3 pt-3 border-t border-white/20 flex items-center justify-between text-xs font-semibold">
+                      <span className="text-sky-300">Open Mon–Fri 9:00 am – 5:00 pm</span>
+                      <a href="tel:01465712213" className="hover:underline flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5" />
                         01465 712213
                       </a>
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => onOpenBooking(heroTreatmentSelect)}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-[#0B3B60] to-[#0284C7] hover:from-[#092e4b] hover:to-[#0274ae] text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
-                  >
-                    <span>Proceed to Slot Selection</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-
-                  <div className="text-center text-[11px] text-slate-400">
-                    No payment required to submit appointment request
-                  </div>
                 </div>
               </div>
             </div>
@@ -264,132 +283,78 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* 2. PRACTICE TRUST PILLARS */}
+      {/* 2. TRUST BAR (Directly below Hero) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Card 1 */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
-            <div className="h-36 overflow-hidden relative">
-              <img
-                src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80"
-                alt="NHS and Private Dentistry"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-white text-xs font-bold">
-                <ShieldCheck className="w-4 h-4 text-sky-400" />
-                <span>NHS & Private Care</span>
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+            {/* Trust Item 1 */}
+            <div className="flex items-start gap-3.5 pt-4 sm:pt-0 sm:px-3 first:pt-0 first:pl-0">
+              <div className="w-10 h-10 rounded-xl bg-sky-50 text-[#0B3B60] flex items-center justify-center flex-shrink-0">
+                <ShieldCheck className="w-5 h-5 text-sky-700" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">NHS & Private Dentistry</h3>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  Comprehensive routine family care alongside private cosmetic & restorative options.
+                </p>
               </div>
             </div>
-            <div className="p-5">
-              <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
-                NHS & Private Under One Roof
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                We offer essential routine Scottish NHS dentistry alongside high-end cosmetic smile
-                rejuvenation, implants, and adult braces.
-              </p>
-            </div>
-          </div>
 
-          {/* Card 2 */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
-            <div className="h-36 overflow-hidden relative">
-              <img
-                src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=600&q=80"
-                alt="NES Approved Training Practice"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-white text-xs font-bold">
-                <Award className="w-4 h-4 text-sky-400" />
-                <span>NES Accredited</span>
+            {/* Trust Item 2 */}
+            <div className="flex items-start gap-3.5 pt-4 sm:pt-0 sm:px-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                <Heart className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">Family Dental Care</h3>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  Childsmile accredited practice dedicated to caring for children, parents, and seniors.
+                </p>
               </div>
             </div>
-            <div className="p-5">
-              <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
-                NES Approved Training Practice
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Officially accredited by NHS Education for Scotland to train newly qualified dental
-                surgeons, upholding rigorous modern clinical standards.
-              </p>
-            </div>
-          </div>
 
-          {/* Card 3 */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
-            <div className="h-36 overflow-hidden relative">
-              <img
-                src="https://images.unsplash.com/photo-1629909615184-74f495363b67?auto=format&fit=crop&w=600&q=80"
-                alt="Stair-Free Downstairs Surgery"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-white text-xs font-bold">
-                <Accessibility className="w-4 h-4 text-sky-400" />
-                <span>Step-Free Access</span>
+            {/* Trust Item 3 */}
+            <div className="flex items-start gap-3.5 pt-4 sm:pt-0 sm:px-3">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center flex-shrink-0">
+                <Award className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">Experienced Dental Team</h3>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  GDC-registered dentists and an NES-approved postgraduate training practice.
+                </p>
               </div>
             </div>
-            <div className="p-5">
-              <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
-                Stair-Free Downstairs Surgery
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Full ground-floor wheelchair accessibility and accessible toilet facilities ensure
-                comfortable visits for elderly and mobility-impaired patients.
-              </p>
-            </div>
-          </div>
 
-          {/* Card 4 */}
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
-            <div className="h-36 overflow-hidden relative">
-              <img
-                src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=600&q=80"
-                alt="State-of-the-Art LDU"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-white text-xs font-bold">
-                <Sparkles className="w-4 h-4 text-sky-400" />
-                <span>SHTM 2010 LDU</span>
+            {/* Trust Item 4 */}
+            <div className="flex items-start gap-3.5 pt-4 sm:pt-0 sm:px-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-5 h-5 text-rose-600" />
               </div>
-            </div>
-            <div className="p-5">
-              <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
-                State-of-the-Art LDU
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Our dedicated Local Decontamination Unit strictly complies with Scottish Health
-                Technical Memorandum guidelines for absolute patient safety.
-              </p>
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">Emergency Dental Care</h3>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  Prompt phone triage from 9:00 am on weekdays; out-of-hours cover via NHS 24 on 111.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. TREATMENTS SHOWCASE WITH DENTAL IMAGES */}
+      {/* 3. POPULAR TREATMENTS (Near top of homepage) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
-              Our Clinical Services
+              Clinical Services
             </span>
             <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900 mt-1">
-              Comprehensive Dental Care for Girvan
+              Popular Dental Treatments
             </h2>
             <p className="text-sm text-slate-600 mt-1 max-w-xl">
-              From preventive Childsmile visits to bespoke cosmetic makeovers and dental implants,
-              explore treatments available at 78 Dalrymple Street.
+              From everyday oral maintenance to advanced smile enhancements, explore the treatments
+              available at our Girvan surgery.
             </p>
           </div>
 
@@ -397,168 +362,302 @@ export const HomePage: React.FC<HomePageProps> = ({
             onClick={() => onNavigate('treatments')}
             className="inline-flex items-center gap-1.5 text-sm font-bold text-[#0B3B60] hover:text-sky-700 transition-colors"
           >
-            <span>View Full Treatment Catalog</span>
+            <span>View All Clinical Services</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Category Filters */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-              selectedCategory === 'all'
-                ? 'bg-[#0B3B60] text-white shadow-sm'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            All Services
-          </button>
-          {TREATMENT_CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                selectedCategory === cat.id
-                  ? 'bg-[#0B3B60] text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Treatment Grid With Dental Imagery */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTreatments.map((treatment) => (
+        {/* 8 Treatment Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {POPULAR_TREATMENTS.map((treatment) => (
             <div
               key={treatment.id}
-              className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between hover:border-sky-300 hover:shadow-lg transition-all group"
+              className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between hover:border-sky-300 hover:shadow-md transition-all group"
             >
-              {/* Treatment Dental Photo Header */}
-              <div className="h-48 overflow-hidden relative bg-slate-100">
-                <img
-                  src={treatment.imageUrl || 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=800&q=80'}
-                  alt={treatment.name}
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-                {/* NHS / Private Badges Overlay */}
-                <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                  {treatment.isNhs && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#005EB8] text-white shadow-sm">
-                      NHS Available
-                    </span>
-                  )}
-                  {treatment.isPrivate && (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500 text-white shadow-sm">
-                      Private
-                    </span>
-                  )}
+              <div>
+                {/* Treatment Image Header */}
+                <div className="h-44 overflow-hidden relative bg-slate-100">
+                  <img
+                    src={treatment.imageUrl}
+                    alt={treatment.name}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <span className="absolute bottom-2.5 left-3 text-[10px] font-bold text-white bg-black/60 px-2 py-0.5 rounded backdrop-blur-xs">
+                    {treatment.category}
+                  </span>
                 </div>
 
-                <div className="absolute bottom-2.5 right-3 text-white text-[11px] font-semibold bg-black/60 px-2.5 py-0.5 rounded-lg backdrop-blur-xs flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-sky-300" />
-                  <span>{treatment.duration}</span>
+                <div className="p-5">
+                  <h3 className="font-display font-bold text-base text-slate-900 group-hover:text-[#0B3B60] transition-colors">
+                    {treatment.name}
+                  </h3>
+                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                    {treatment.description}
+                  </p>
                 </div>
               </div>
 
-              <div className="p-6 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display font-bold text-lg text-slate-900 group-hover:text-[#0B3B60] transition-colors leading-snug">
-                    {treatment.name}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-3 leading-relaxed">
-                    {treatment.summary}
-                  </p>
-
-                  {/* Benefits snippet */}
-                  <ul className="mt-4 space-y-1.5 text-xs text-slate-600">
-                    {treatment.keyBenefits.slice(0, 2).map((benefit, idx) => (
-                      <li key={idx} className="flex items-start gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                        <span>{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="pt-5 mt-4 border-t border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">
-                      Fee Guide
-                    </span>
-                    <span className="text-xs font-bold text-[#0B3B60]">
-                      {treatment.startingPrice}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => onOpenBooking(treatment.name)}
-                    className="px-3.5 py-2 bg-sky-50 hover:bg-[#0B3B60] text-[#0B3B60] hover:text-white rounded-xl text-xs font-bold transition-colors shadow-xs"
-                  >
-                    Book Slot
-                  </button>
-                </div>
+              <div className="p-5 pt-0">
+                <button
+                  onClick={() => {
+                    if (treatment.id === 'implants') {
+                      onOpenBooking('Dental Implants');
+                    } else if (treatment.id === 'whitening') {
+                      onOpenBooking('Teeth Whitening');
+                    } else {
+                      onNavigate('treatments');
+                    }
+                  }}
+                  className="w-full py-2.5 px-3 bg-sky-50 hover:bg-[#0B3B60] text-[#0B3B60] hover:text-white rounded-xl text-xs font-bold transition-colors text-center inline-flex items-center justify-center gap-1.5"
+                >
+                  <span>Learn More</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 5. SMILE MAKEOVER & QUIZ BANNER WITH DENTAL VISUAL */}
+      {/* 4. NEW PATIENTS SECTION (After Treatments) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="bg-gradient-to-br from-[#0B3B60] via-[#0e4977] to-[#0284C7] rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl">
+        <div className="bg-gradient-to-br from-[#0B3B60] to-[#044c80] rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            <div className="lg:col-span-7 space-y-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-sky-100">
-                <Sparkles className="w-3.5 h-3.5 text-sky-300" />
-                Cosmetic Dentistry & Orthodontics
+            <div className="lg:col-span-8 space-y-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-sky-200">
+                <Users className="w-3.5 h-3.5 text-sky-300" />
+                Patient Registrations & Inquiries
               </span>
+
               <h2 className="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight">
-                Ready to Transform Your Smile in 2026?
+                Looking for a Dentist in Girvan?
               </h2>
-              <p className="text-sm sm:text-base text-sky-100 leading-relaxed">
-                Whether you want boutique home teeth whitening, discreet C-Fast adult tooth
-                straightening in 4–6 months, or seamless composite bonding, our cosmetic dental team
-                is here to help you smile with confidence.
+
+              <p className="text-sm sm:text-base text-sky-100 leading-relaxed max-w-2xl">
+                We welcome patient enquiries and registrations for private dental care, consultations,
+                and family appointments. Whether you are new to the area or haven't visited a dentist in
+                some time, our welcoming reception team is here to guide you through registering and scheduling
+                your initial consultation.
               </p>
 
               <div className="pt-2 flex flex-wrap items-center gap-3">
                 <button
-                  onClick={onOpenSmileQuiz}
-                  className="px-6 py-3 bg-white text-[#0B3B60] hover:bg-sky-50 rounded-xl font-bold text-sm shadow-md transition-all active:scale-98"
+                  onClick={() => onOpenBooking()}
+                  className="px-6 py-3.5 bg-white text-[#0B3B60] hover:bg-sky-50 rounded-xl font-bold text-sm shadow-md transition-all active:scale-98 inline-flex items-center gap-2"
                 >
-                  Take the 30-Second Smile Quiz
+                  <Calendar className="w-4 h-4 text-sky-700" />
+                  <span>Request an Appointment</span>
+                </button>
+
+                <a
+                  href="tel:01465712213"
+                  className="px-5 py-3.5 bg-white/15 hover:bg-white/20 text-white rounded-xl font-bold text-sm border border-white/30 transition-colors inline-flex items-center gap-2"
+                >
+                  <Phone className="w-4 h-4 text-sky-300" />
+                  <span>Call the Practice: 01465 712213</span>
+                </a>
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 bg-white/10 rounded-2xl p-6 border border-white/15 backdrop-blur-xs space-y-3">
+              <div className="text-xs uppercase font-bold text-sky-300 tracking-wider">
+                Practice Registration Note
+              </div>
+              <p className="text-xs text-slate-100 leading-relaxed">
+                Please contact our reception desk to confirm current registration options, fees, or Denplan
+                membership plans. We are located at 78 Dalrymple Street with stair-free surgery access.
+              </p>
+              <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-sky-200">
+                <Clock className="w-4 h-4 text-sky-300 flex-shrink-0" />
+                <span>Mon – Fri: 9:00 am – 5:00 pm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. WHY CHOOSE GIRVAN DENTAL PRACTICE */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
+            Patient-First Dentistry
+          </span>
+          <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900 mt-1">
+            Why Choose Girvan Dental Practice?
+          </h2>
+          <p className="text-sm text-slate-600 mt-2">
+            Committed to providing high-quality, gentle dental care to families in South Ayrshire.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Pillar 1 */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-sky-50 text-[#0B3B60] flex items-center justify-center mb-4">
+              <Users className="w-5 h-5 text-sky-700" />
+            </div>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
+              Friendly & Experienced Team
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Led by Dr. Tanu Sharma, our skilled, compassionate dental surgeons and qualified dental
+              nurses prioritize gentle treatment and patient comfort at every stage.
+            </p>
+          </div>
+
+          {/* Pillar 2 */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-4">
+              <Heart className="w-5 h-5 text-emerald-600" />
+            </div>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
+              Family Dental Care
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              We welcome patients of all generations, offering the Scottish NHS Childsmile program to help
+              young children establish positive oral habits and healthy teeth from an early age.
+            </p>
+          </div>
+
+          {/* Pillar 3 */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center mb-4">
+              <ShieldCheck className="w-5 h-5 text-indigo-600" />
+            </div>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
+              NHS & Private Treatment Options
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              We provide routine NHS dental treatments alongside private cosmetic treatments, dental
+              implants, and affordable Denplan Essentials payment arrangements.
+            </p>
+          </div>
+
+          {/* Pillar 4 */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center mb-4">
+              <Sparkles className="w-5 h-5 text-purple-600" />
+            </div>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
+              Modern Treatment Options
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Equipped with a dedicated SHTM 2010 Local Decontamination Unit (LDU) and modern dental
+              materials for safe, dependable restorative and cosmetic outcomes.
+            </p>
+          </div>
+
+          {/* Pillar 5 */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center mb-4">
+              <MapPin className="w-5 h-5 text-amber-600" />
+            </div>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
+              Convenient Local Care in Girvan
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Located conveniently in the town center at 78 Dalrymple Street, featuring stair-free
+              ground-floor surgery and disabled toilet access for mobility-impaired patients.
+            </p>
+          </div>
+
+          {/* Pillar 6 */}
+          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all">
+            <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center mb-4">
+              <Award className="w-5 h-5 text-sky-600" />
+            </div>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-1.5">
+              NES Approved Training Practice
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Accredited by NHS Education for Scotland to train newly qualified dental surgeons,
+              reflecting our commitment to rigorous clinical guidelines and continuous education.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. DENTAL IMPLANTS FEATURE SECTION */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 border border-slate-800 relative overflow-hidden shadow-xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                Advanced Restorative Dentistry
+              </span>
+
+              <h2 className="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight">
+                Permanent Dental Implants in Girvan
+              </h2>
+
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                Restore the natural appearance, chewing function, and long-term confidence of your smile.
+                Placed by experienced implant clinician Dr. Sada Mangalampalli, dental implants provide a secure,
+                permanent foundation for replacement crowns, bridges, or fixed dentures without modifying adjacent teeth.
+              </p>
+
+              {/* Main Benefits List */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs sm:text-sm text-slate-200">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
+                  <span>Permanent replacement for missing teeth</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
+                  <span>Preserves jawbone health & facial profile</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
+                  <span>Eat, speak, and laugh with complete confidence</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
+                  <span>Tailored, written treatment plans</span>
+                </div>
+              </div>
+
+              {/* Consultation note */}
+              <p className="text-xs text-slate-400 pt-1">
+                Implant consultations available – comprehensive clinical examination & tailored written treatment plan.
+              </p>
+
+              {/* Buttons */}
+              <div className="pt-3 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => onOpenBooking('Dental Implants')}
+                  className="px-6 py-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-sm rounded-xl transition-all shadow-md active:scale-98"
+                >
+                  Book a Consultation
                 </button>
                 <button
-                  onClick={() => onOpenBooking('Cosmetic Consultation (Whitening & Bonding)')}
-                  className="px-5 py-3 bg-white/15 hover:bg-white/20 text-white rounded-xl font-bold text-sm border border-white/30 transition-colors"
+                  onClick={() => onNavigate('treatments')}
+                  className="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm rounded-xl border border-slate-700 transition-colors"
                 >
-                  Book a Cosmetic Consultation
+                  Explore Dental Implants
                 </button>
               </div>
             </div>
 
-            <div className="lg:col-span-5 relative">
-              <div className="rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl relative">
+            {/* Right Image */}
+            <div className="lg:col-span-5">
+              <div className="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl relative">
                 <img
-                  src="https://images.unsplash.com/photo-1609840114035-3c981b782dfe?auto=format&fit=crop&w=800&q=80"
-                  alt="Cosmetic Dentistry Whitening"
+                  src="https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&fit=crop&w=800&q=80"
+                  alt="Dental Implants Girvan Dental Practice"
                   referrerPolicy="no-referrer"
-                  className="w-full h-64 object-cover"
+                  className="w-full h-72 sm:h-80 object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
                   <span className="text-[11px] font-bold text-sky-300 uppercase tracking-wider block">
-                    Cosmetic Smile Design
+                    Clinical Implantology
                   </span>
-                  <p className="text-xs font-semibold text-white/90">
-                    Natural, radiant results with custom tooth whitening and composite bonding.
+                  <p className="text-xs font-semibold text-slate-200">
+                    Dr. Sada Mangalampalli &bull; Certified in 3D Guided Implant Surgery
                   </p>
                 </div>
               </div>
@@ -567,19 +666,98 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* 6. MEET OUR DENTISTS */}
+      {/* 7. EMERGENCY DENTIST SECTION (After Implant Section) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="bg-rose-50 border-2 border-rose-200 rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-8 space-y-4">
+              <div className="flex items-center gap-2 text-rose-700 font-bold text-xs uppercase tracking-wider">
+                <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <span>Dental Pain & Urgent Triage</span>
+              </div>
+
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-rose-950">
+                Need an Emergency Dentist in Girvan?
+              </h2>
+
+              <p className="text-xs sm:text-sm text-rose-900 leading-relaxed max-w-2xl">
+                If you are experiencing severe dental discomfort or an acute problem, our reception
+                team is here to help triage your symptoms and arrange an appointment as swiftly as possible.
+              </p>
+
+              {/* Common Emergency Problems List */}
+              <div className="pt-2">
+                <span className="text-xs font-bold text-rose-950 uppercase tracking-wider block mb-2">
+                  Common Dental Emergencies We Treat:
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-medium text-rose-900">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600 flex-shrink-0" />
+                    <span>Severe or throbbing toothache</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600 flex-shrink-0" />
+                    <span>Dental swelling or suspected abscess</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600 flex-shrink-0" />
+                    <span>Broken, chipped, or fractured tooth</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600 flex-shrink-0" />
+                    <span>Lost filling or dislodged crown</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600 flex-shrink-0" />
+                    <span>Bleeding gums or trauma from an accident</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Triage Guidance Note */}
+              <p className="text-[11px] text-rose-800 italic pt-1">
+                Please call our surgery promptly at 9:00 am on weekday mornings on 01465 712213 so we can triage your condition. Outside of normal practice hours, dental emergencies are managed via NHS 24 on 111.
+              </p>
+            </div>
+
+            {/* Action Card */}
+            <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-rose-200 shadow-sm text-center space-y-3">
+              <span className="text-xs font-bold text-rose-700 uppercase tracking-wider block">
+                Immediate Urgent Assistance
+              </span>
+              <a
+                href="tel:01465712213"
+                className="w-full py-3.5 px-4 bg-rose-700 hover:bg-rose-800 text-white font-bold text-base rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
+              >
+                <Phone className="w-5 h-5 flex-shrink-0" />
+                <span>Call Now: 01465 712213</span>
+              </a>
+              <button
+                onClick={() => onNavigate('emergency')}
+                className="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition-colors"
+              >
+                View Emergency Triage Guide
+              </button>
+              <div className="text-[11px] text-slate-500 pt-1">
+                Surgery phone lines open at 9:00 AM weekdays
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. MEET THE DENTAL TEAM */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
-              Clinical Excellence
+              Clinical Team
             </span>
             <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900 mt-1">
-              Meet the Girvan Dental Team
+              Meet the Dental Team
             </h2>
             <p className="text-sm text-slate-600 mt-1 max-w-xl">
-              Experienced, gentle dental professionals dedicated to caring for our South Ayrshire
-              patients with the highest standards of clinical precision.
+              Experienced, gentle dental surgeons dedicated to looking after your oral health at 78 Dalrymple Street.
             </p>
           </div>
 
@@ -613,31 +791,20 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </div>
 
                 <div className="p-5">
-                  <h3 className="font-display font-bold text-lg text-slate-900">{dentist.name}</h3>
+                  <h3 className="font-display font-bold text-base text-slate-900">{dentist.name}</h3>
                   <div className="text-xs font-semibold text-sky-700 mt-0.5">{dentist.role}</div>
                   <div className="text-[11px] text-slate-400 mt-0.5">{dentist.qualifications}</div>
 
                   <p className="text-xs text-slate-600 mt-3 line-clamp-3 leading-relaxed">
                     {dentist.bio}
                   </p>
-
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {dentist.specialties.slice(0, 2).map((s, idx) => (
-                      <span
-                        key={idx}
-                        className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full font-medium"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               </div>
 
               <div className="p-5 pt-0">
                 <button
                   onClick={() => onOpenBooking(undefined, dentist.name)}
-                  className="w-full py-2 px-3 bg-sky-50 hover:bg-[#0B3B60] text-[#0B3B60] hover:text-white rounded-xl text-xs font-bold transition-colors text-center"
+                  className="w-full py-2.5 px-3 bg-sky-50 hover:bg-[#0B3B60] text-[#0B3B60] hover:text-white rounded-xl text-xs font-bold transition-colors text-center"
                 >
                   Book with {dentist.name.split(' ')[1] || dentist.name}
                 </button>
@@ -647,182 +814,382 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* 7. DENPLAN ESSENTIALS BANNER WITH CLINICAL PHOTO */}
+      {/* 9. PATIENT REVIEWS (Google-style review section) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-slate-800 relative overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-8 space-y-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                Budgeting Routine Dental Care
-              </span>
-              <h2 className="font-display font-bold text-2xl sm:text-3xl text-white">
-                Denplan Essentials at Girvan Dental Practice
+        <div className="bg-slate-50 border border-slate-200/90 rounded-3xl p-6 sm:p-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-bold text-sm text-slate-800">Google Patient Reviews</span>
+                <span className="text-xs text-slate-400">&bull;</span>
+                <div className="flex items-center gap-1 text-amber-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                  <span className="text-xs font-bold text-slate-900 ml-1">5.0 Star Rating</span>
+                </div>
+              </div>
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900">
+                What Our Patients Say
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Spread the cost of preventive care for only{' '}
-                <strong className="text-white text-base">£18.85 per month</strong>. Includes 2
-                comprehensive dental exams, 2 hygiene scaling appointments, necessary x-rays, and a
-                10%–15% discount on private treatments.
+              <p className="text-sm text-slate-600 mt-1">
+                Real feedback from local Girvan families, Turnberry, Maybole, and Ballantrae patients.
               </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-200 pt-2">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                  <span>2 Examinations + 2 Hygiene visits included</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                  <span>10% off fillings, root canals, extractions</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                  <span>15% off lab treatments (crowns, dentures)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-sky-400 flex-shrink-0" />
-                  <span>Optional 24h Worldwide Emergency cover (+60p)</span>
-                </div>
-              </div>
             </div>
 
-            <div className="lg:col-span-4 bg-slate-800/80 rounded-2xl p-6 border border-slate-700 text-center space-y-3">
-              <div className="text-xs uppercase font-bold text-sky-400 tracking-wider">
-                Monthly Dental Membership
-              </div>
-              <div className="text-4xl font-extrabold text-white">
-                £18.85<span className="text-sm text-slate-400 font-normal"> / month</span>
-              </div>
-              <div className="text-xs text-emerald-400 font-semibold">
-                Saves over £30/year vs pay-as-you-go
-              </div>
-              <button
-                onClick={() => onNavigate('fees')}
-                className="w-full py-2.5 px-4 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl text-xs transition-colors shadow-sm"
+            <button
+              onClick={() => setShowAllReviewsModal(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold rounded-xl border border-slate-300 transition-colors shadow-xs flex-shrink-0"
+            >
+              <span>Read More Reviews</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {TESTIMONIALS.slice(0, 4).map((t) => (
+              <div
+                key={t.id}
+                className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between"
               >
-                Explore Plan & Savings Calculator
-              </button>
-            </div>
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-0.5 text-amber-400">
+                      {[...Array(t.rating)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-slate-400">{t.date}</span>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-600 italic leading-relaxed">
+                    "{t.comment}"
+                  </p>
+                </div>
+
+                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div>
+                    <strong className="block text-slate-900 font-bold">{t.author}</strong>
+                    <span className="text-slate-400 text-[11px]">{t.location}</span>
+                  </div>
+                  <span className="text-[10px] bg-sky-50 text-sky-800 px-2 py-0.5 rounded font-semibold max-w-[120px] truncate">
+                    {t.treatment}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 8. PATIENT TESTIMONIALS */}
+      {/* 10. CONTACT / FIND US SECTION (Near bottom) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1 text-amber-500 mb-2">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-            ))}
-          </div>
-          <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900">
-            Trusted by Patients Across South Ayrshire
-          </h2>
-          <p className="text-sm text-slate-600 mt-2">
-            Real feedback from local Girvan families, Turnberry, Maybole, and Ballantrae residents.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left Column: Practice Info & Map */}
+          <div className="lg:col-span-6 space-y-6">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
+                Location & Hours
+              </span>
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900 mt-1">
+                Find Us in Girvan
+              </h2>
+              <p className="text-sm text-slate-600 mt-1">
+                Centrally located on Dalrymple Street with nearby street parking and bus connections.
+              </p>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {TESTIMONIALS.map((t) => (
-            <div
-              key={t.id}
-              className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center gap-1 text-amber-400 mb-3">
-                  {[...Array(t.rating)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
-                  ))}
+            {/* Practice Details Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-2xl border border-slate-200">
+                <div className="flex items-center gap-2 text-sky-700 font-bold text-xs uppercase mb-1.5">
+                  <MapPin className="w-4 h-4" />
+                  <span>Surgery Address</span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 italic leading-relaxed">
-                  "{t.comment}"
+                <p className="text-xs font-semibold text-slate-900 leading-relaxed">
+                  78 Dalrymple Street<br />
+                  Girvan, Ayrshire<br />
+                  KA26 9BT, Scotland
+                </p>
+                <div className="mt-2 text-[11px] text-emerald-700 font-medium flex items-center gap-1">
+                  <Accessibility className="w-3.5 h-3.5" />
+                  <span>Stair-free ground floor access</span>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl border border-slate-200">
+                <div className="flex items-center gap-2 text-sky-700 font-bold text-xs uppercase mb-1.5">
+                  <Phone className="w-4 h-4" />
+                  <span>Contact Details</span>
+                </div>
+                <p className="text-xs text-slate-600 space-y-1">
+                  <span className="block font-bold text-slate-900">
+                    Phone: <a href="tel:01465712213" className="text-[#0B3B60] hover:underline">01465 712213</a>
+                  </span>
+                  <span className="block truncate">
+                    Email: <a href="mailto:reception@girvandental.co.uk" className="text-[#0B3B60] hover:underline">reception@girvandental.co.uk</a>
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            {/* Opening Hours Box */}
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-2">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-xs uppercase">
+                <Clock className="w-4 h-4 text-sky-600" />
+                <span>Practice Opening Hours</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 pt-1">
+                <div>
+                  <span className="font-semibold text-slate-800">Monday – Friday:</span>
+                  <p>9:00 am – 5:00 pm</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-slate-800">Saturday & Sunday:</span>
+                  <p className="text-slate-500">Closed (NHS 24: dial 111)</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Embedded Google Map */}
+            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-xs h-64 bg-slate-100">
+              <iframe
+                title="Girvan Dental Practice Map Location"
+                src="https://maps.google.com/maps?q=78%20Dalrymple%20Street%20Girvan%20KA26%209BT&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Short Appointment / Enquiry Form */}
+          <div className="lg:col-span-6">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-md">
+              <div className="mb-5">
+                <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
+                  Online Inquiry
+                </span>
+                <h3 className="font-display font-bold text-xl sm:text-2xl text-slate-900 mt-0.5">
+                  Request an Appointment or Callback
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Fill in your details below and our reception team will get in touch promptly during surgery hours.
                 </p>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                <div>
-                  <strong className="block text-slate-900 font-bold">{t.author}</strong>
-                  <span className="text-slate-400">{t.location}</span>
+              {formSubmitted ? (
+                <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-3">
+                  <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
+                  <h4 className="font-bold text-base text-emerald-950">Thank You! Your Request Has Been Received</h4>
+                  <p className="text-xs text-emerald-800 leading-relaxed max-w-md mx-auto">
+                    A member of our reception desk at 78 Dalrymple Street will contact you by phone or email to confirm a convenient appointment time.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setFormSubmitted(false);
+                      setFormData({
+                        name: '',
+                        phone: '',
+                        email: '',
+                        treatment: 'General Routine Appointment',
+                        message: '',
+                      });
+                    }}
+                    className="px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold hover:bg-emerald-800 transition-colors"
+                  >
+                    Send Another Inquiry
+                  </button>
                 </div>
-                <span className="text-[10px] bg-sky-50 text-sky-800 px-2 py-0.5 rounded font-semibold">
-                  {t.treatment}
-                </span>
-              </div>
+              ) : (
+                <form onSubmit={handleFormSubmit} className="space-y-4 text-xs sm:text-sm">
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Fiona Macleod"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#0B3B60]"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="e.g. 07123 456789"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#0B3B60]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-slate-700 mb-1">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="e.g. fiona@example.co.uk"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#0B3B60]"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      Reason for Visit / Treatment Required
+                    </label>
+                    <select
+                      value={formData.treatment}
+                      onChange={(e) => setFormData({ ...formData, treatment: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 font-medium focus:ring-2 focus:ring-[#0B3B60]"
+                    >
+                      <option value="General Routine Appointment">Routine Examination / Check-up</option>
+                      <option value="Dental Implants Consultation">Dental Implants Consultation</option>
+                      <option value="Teeth Whitening">Teeth Whitening</option>
+                      <option value="Clear Aligners & C-Fast">Clear Aligners / C-Fast Adult Orthodontics</option>
+                      <option value="Dental Hygiene Scaling">Dental Hygiene & Gum Therapy</option>
+                      <option value="Crowns or Dentures">Crowns, Bridges or Dentures</option>
+                      <option value="Toothache or Emergency">Toothache / Urgent Dental Issue</option>
+                      <option value="New Patient Registration Enquiry">New Patient Registration Enquiry</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-slate-700 mb-1">
+                      Additional Message or Notes (Optional)
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Let us know if you have any dental anxiety, mobility requirements, or preferred days/times..."
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#0B3B60] resize-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3.5 px-4 bg-gradient-to-r from-[#0B3B60] to-[#0284C7] hover:from-[#092e4b] hover:to-[#0274ae] text-white rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 active:scale-98"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Request Appointment</span>
+                  </button>
+
+                  <div className="text-center text-[11px] text-slate-400 pt-1">
+                    Your details are protected under GDPR & medical confidentiality standards.
+                  </div>
+                </form>
+              )}
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
-      {/* 9. EMERGENCY & CONTACT PREVIEW BANNER WITH REAL CLINICAL IMAGES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Emergency Card */}
-          <div className="lg:col-span-6 bg-rose-50 border border-rose-200 rounded-3xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative">
-            <div className="space-y-3 relative z-10">
-              <div className="flex items-center gap-2 text-rose-700 font-bold text-xs uppercase tracking-wider">
-                <AlertCircle className="w-4 h-4 text-rose-600" />
-                <span>Dental Emergencies & Toothache</span>
-              </div>
-              <h3 className="font-display font-bold text-xl sm:text-2xl text-rose-950">
-                In Severe Pain or Broken Tooth?
-              </h3>
-              <p className="text-xs sm:text-sm text-rose-900 leading-relaxed">
-                Registered patients can access dedicated same-day emergency triage slots. Please
-                phone the surgery at 9:00 am on weekday mornings. Outside practice hours, dental
-                emergencies are managed via NHS 24 on 111.
-              </p>
-            </div>
+      {/* 11. FINAL CTA SECTION (Before Footer) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 pb-4">
+        <div className="bg-gradient-to-r from-[#0B3B60] via-[#092e4b] to-[#044c80] rounded-3xl p-8 sm:p-12 text-white shadow-xl text-center relative overflow-hidden">
+          <div className="max-w-2xl mx-auto space-y-4 relative z-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-sky-200">
+              <Calendar className="w-3.5 h-3.5 text-sky-300" />
+              Patient Bookings & Consultations
+            </span>
 
-            <div className="pt-6 flex flex-wrap items-center gap-3 relative z-10">
-              <a
-                href="tel:01465712213"
-                className="px-4 py-2.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
-              >
-                Call Surgery: 01465 712213
-              </a>
-              <button
-                onClick={() => onNavigate('emergency')}
-                className="px-4 py-2.5 bg-white text-rose-800 hover:bg-rose-100 font-bold text-xs rounded-xl border border-rose-300 transition-colors"
-              >
-                View Emergency Triage Guide
-              </button>
-            </div>
-          </div>
+            <h2 className="font-display font-bold text-2xl sm:text-4xl text-white tracking-tight">
+              Ready to Book Your Dental Appointment?
+            </h2>
 
-          {/* Location & Accessibility Card */}
-          <div className="lg:col-span-6 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 flex flex-col justify-between overflow-hidden relative">
-            <div className="space-y-3 relative z-10">
-              <div className="flex items-center gap-2 text-sky-700 font-bold text-xs uppercase tracking-wider">
-                <MapPin className="w-4 h-4 text-sky-600" />
-                <span>Find Us in Girvan</span>
-              </div>
-              <h3 className="font-display font-bold text-xl sm:text-2xl text-slate-900">
-                78 Dalrymple Street, Girvan KA26 9BT
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Conveniently located in the heart of Girvan with nearby on-street parking and
-                convenient bus connections. Our ground-floor surgery offers full stair-free
-                wheelchair accessibility.
-              </p>
-            </div>
+            <p className="text-sm sm:text-base text-sky-100 leading-relaxed">
+              From routine family check-ups and hygiene cleaning to dental implants and acute emergency pain relief, our team at 78 Dalrymple Street is here to care for your smile.
+            </p>
 
-            <div className="pt-6 flex flex-wrap items-center gap-3 relative z-10">
-              <button
-                onClick={() => onNavigate('contact')}
-                className="px-4 py-2.5 bg-[#0B3B60] hover:bg-[#082842] text-white font-bold text-xs rounded-xl transition-colors shadow-xs"
-              >
-                Directions & Practice Hours
-              </button>
+            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={() => onOpenBooking()}
-                className="px-4 py-2.5 bg-sky-50 text-[#0B3B60] hover:bg-sky-100 font-bold text-xs rounded-xl border border-sky-200 transition-colors"
+                className="w-full sm:w-auto px-7 py-3.5 bg-white text-[#0B3B60] hover:bg-sky-50 rounded-xl font-bold text-sm shadow-lg transition-all active:scale-98 inline-flex items-center justify-center gap-2"
               >
-                Schedule Visit Online
+                <Calendar className="w-4 h-4 text-sky-700" />
+                <span>Book an Appointment</span>
               </button>
+
+              <a
+                href="tel:01465712213"
+                className="w-full sm:w-auto px-6 py-3.5 bg-white/15 hover:bg-white/20 text-white rounded-xl font-bold text-sm border border-white/30 transition-colors inline-flex items-center justify-center gap-2"
+              >
+                <Phone className="w-4 h-4 text-sky-300" />
+                <span>Call 01465 712213</span>
+              </a>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Reviews Modal for "Read More Reviews" */}
+      {showAllReviewsModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white text-slate-800 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+            <button
+              onClick={() => setShowAllReviewsModal(false)}
+              className="absolute top-5 right-5 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 text-[#0B3B60] mb-1">
+              <Star className="w-5 h-5 text-amber-500 fill-amber-400" />
+              <h3 className="font-display font-bold text-xl text-slate-900">Patient Testimonials</h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-6">
+              Verified feedback from patients visiting Girvan Dental Practice at 78 Dalrymple Street.
+            </p>
+
+            <div className="space-y-4">
+              {TESTIMONIALS.map((t) => (
+                <div key={t.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-0.5 text-amber-400">
+                      {[...Array(t.rating)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+                      ))}
+                    </div>
+                    <span className="text-[11px] text-slate-400">{t.date}</span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-700 italic leading-relaxed">
+                    "{t.comment}"
+                  </p>
+                  <div className="pt-2 mt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-900">{t.author} ({t.location})</span>
+                    <span className="text-[11px] text-sky-800 font-semibold">{t.treatment}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-6 mt-4 border-t border-slate-100 text-right">
+              <button
+                onClick={() => setShowAllReviewsModal(false)}
+                className="px-5 py-2.5 bg-[#0B3B60] text-white text-xs font-bold rounded-xl"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

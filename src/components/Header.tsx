@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="inline-flex items-center gap-1.5 2xl:gap-2 px-3.5 2xl:px-4 py-2 2xl:py-2.5 bg-gradient-to-r from-[#0B3B60] to-[#0284C7] hover:from-[#092e4b] hover:to-[#0274ae] text-white text-xs 2xl:text-sm font-bold rounded-xl shadow-xs hover:shadow-md transition-all active:scale-98 whitespace-nowrap flex-shrink-0"
           >
             <Calendar className="w-3.5 h-3.5 2xl:w-4 2xl:h-4 text-sky-200 flex-shrink-0" />
-            <span className="whitespace-nowrap">Book Appointment</span>
+            <span className="whitespace-nowrap">Book an Appointment</span>
           </button>
         </div>
 
