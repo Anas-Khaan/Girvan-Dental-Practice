@@ -3,13 +3,11 @@ import React from 'react';
 interface LogoProps {
   className?: string;
   variant?: 'light' | 'dark' | 'white';
-  showNhsBadge?: boolean;
 }
 
 export const Logo: React.FC<LogoProps> = ({
   className = '',
   variant = 'dark',
-  showNhsBadge = true,
 }) => {
   const isWhite = variant === 'white';
   const textColor = isWhite ? 'text-white' : 'text-[#0B3860]';
@@ -45,16 +43,9 @@ export const Logo: React.FC<LogoProps> = ({
 
       {/* Brand Typography */}
       <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <span className={`font-display font-extrabold text-lg sm:text-xl tracking-tight leading-tight ${textColor}`}>
-            GIRVAN DENTAL
-          </span>
-          {showNhsBadge && (
-            <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-[#005EB8] text-white shadow-xs">
-              NHS
-            </span>
-          )}
-        </div>
+        <span className={`font-display font-extrabold text-lg sm:text-xl tracking-tight leading-tight ${textColor}`}>
+          GIRVAN DENTAL
+        </span>
         <span className={`text-xs sm:text-sm font-medium tracking-wide ${subTextColor}`}>
           Practice &bull; Ayrshire
         </span>
