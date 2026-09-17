@@ -8,7 +8,6 @@ import {
   DENPLAN_ESSENTIALS,
   TESTIMONIALS,
 } from '../data/practiceData';
-import { PracticeImageSlider } from '../components/PracticeImageSlider';
 import {
   Calendar,
   Phone,
@@ -265,42 +264,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* 2. INTERACTIVE CLINICAL TOUR & IMAGE SLIDER */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
-              Interactive Practice Showcase
-            </span>
-            <h2 className="font-display font-bold text-2xl sm:text-3xl text-slate-900 mt-1">
-              Inside Girvan Dental Practice
-            </h2>
-            <p className="text-sm text-slate-600 mt-1 max-w-2xl">
-              Explore our modern dental surgeries, dedicated Local Decontamination Unit (LDU),
-              NHS Childsmile suite, and step-free disabled facilities located at 78 Dalrymple Street.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onNavigate('about')}
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#0B3B60] hover:text-sky-700 transition-colors"
-            >
-              <span>Practice Facilities & History</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Useful Interactive Image Slider */}
-        <PracticeImageSlider
-          onNavigate={onNavigate}
-          onOpenBooking={onOpenBooking}
-          onOpenSmileQuiz={onOpenSmileQuiz}
-        />
-      </section>
-
-      {/* 3. PRACTICE TRUST PILLARS */}
+      {/* 2. PRACTICE TRUST PILLARS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Card 1 */}
